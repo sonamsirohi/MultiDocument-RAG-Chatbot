@@ -17,17 +17,16 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 import pytesseract
 
-# -----------------------------
+
 # Tesseract Setup
-# -----------------------------
+
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 os.environ["PATH"] += r";C:\Program Files\Tesseract-OCR"
 
 print(shutil.which("tesseract"))
 
-# -----------------------------
 # LangChain Imports
-# -----------------------------
+
 from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain_chroma import Chroma
@@ -35,34 +34,29 @@ from langchain_chroma import Chroma
 from unstructured.partition.pdf import partition_pdf
 from unstructured.chunking.title import chunk_by_title
 
-# -----------------------------
+
 # Load ENV
-# -----------------------------
+
 load_dotenv()
 
-# -----------------------------
 # Flask App
-# -----------------------------
+
 app = Flask(__name__)
 app.secret_key = "your_secret_key_123"
 
-# -----------------------------
 # Folders
-# -----------------------------
+
 UPLOAD_FOLDER = "uploads"
 DB_FOLDER = "chroma_db"
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(DB_FOLDER, exist_ok=True)
 
-# -----------------------------
-# TEMP USERS (replace with DB later)
-# -----------------------------
+# TEMP USERS 
+
 users = {}
 
-# =====================================================
 # PDF PROCESSING
-# =====================================================
 def process_pdf(path, filename):
     elements = partition_pdf(
         filename=path,
@@ -82,10 +76,8 @@ def process_pdf(path, filename):
         for c in chunks
     ]
 
-
-# =====================================================
 # VECTOR DB
-# =====================================================
+
 def create_db(documents):
     embedding = OpenAIEmbeddings(model="text-embedding-3-small")
 
@@ -105,17 +97,13 @@ def load_db():
     )
 
 
-# =====================================================
 # ROUTES
-# =====================================================
 @app.route("/")
 def home():
     return render_template("home.html")
 
-
-# -----------------------------
 # SIGNUP
-# -----------------------------
+
 @app.route("/signup", methods=["GET", "POST"])
 def signup():
     if request.method == "POST":
@@ -140,10 +128,7 @@ def signup():
 
     return render_template("signup.html")
 
-
-# -----------------------------
 # LOGIN
-# -----------------------------
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -162,7 +147,7 @@ def login():
         session["user"] = username
         session["uploaded"] = False
 
-        # ⭐ INIT CHAT HISTORY HERE
+        #  INIT CHAT HISTORY HERE
         session["chat_history"] = []
 
         return redirect("/dashboard")
@@ -170,9 +155,7 @@ def login():
     return render_template("login.html")
 
 
-# -----------------------------
 # DASHBOARD
-# -----------------------------
 @app.route("/dashboard")
 def dashboard():
     if "user" not in session:
@@ -186,9 +169,7 @@ def dashboard():
     )
 
 
-# -----------------------------
 # UPLOAD PDFs
-# -----------------------------
 @app.route("/upload", methods=["POST"])
 def upload():
     if "user" not in session:
@@ -218,9 +199,7 @@ def upload():
     return redirect("/dashboard")
 
 
-# -----------------------------
 # ASK (WITH HISTORY)
-# -----------------------------
 @app.route("/ask", methods=["POST"])
 def ask():
     if "user" not in session:
@@ -248,7 +227,7 @@ Question:
 
     answer = llm.invoke(prompt).content
 
-    # ⭐ STORE HISTORY
+    #  STORE HISTORY
     if "chat_history" not in session:
         session["chat_history"] = []
 
@@ -269,17 +248,14 @@ Question:
     )
 
 
-# -----------------------------
 # LOGOUT
-# -----------------------------
 @app.route("/logout")
 def logout():
     session.clear()
     return redirect("/")
 
 
-# =====================================================
+
 # RUN
-# =====================================================
 if __name__ == "__main__":
     app.run(debug=True, use_reloader=False)
