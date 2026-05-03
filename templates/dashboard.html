@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+
+<div class="chat-container">
+
+    <!-- ================= SIDEBAR ================= -->
+    <div class="sidebar">
+
+        <h2>📄 RAG Docs</h2>
+
+        <!-- Upload Section -->
+        <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="files" multiple required>
+            <button type="submit">Upload PDFs</button>
+        </form>
+
+        <hr>
+
+        <p class="status">
+            Status:
+            {% if uploaded %}
+                <span class="ok">Documents Loaded ✔</span>
+            {% else %}
+                <span class="no">No Documents</span>
+            {% endif %}
+        </p>
+
+    </div>
+
+    <!-- ================= MAIN CHAT ================= -->
+    <div class="chat-main">
+
+        <div class="chat-header">
+            <h2>🤖 RAG Assistant</h2>
+            <a href="/logout">Logout</a>
+        </div>
+
+        <!-- CHAT BOX -->
+        <div class="chat-box">
+
+            {% if answer %}
+            <div class="msg user">
+                {{ request.form.query if request.form.query }}
+            </div>
+
+            <div class="msg bot">
+                {{ answer }}
+
+                {% if sources %}
+                <div class="sources">
+                    <b>Sources:</b>
+                    <ul>
+                        {% for s in sources %}
+                        <li>{{ s }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+            </div>
+            {% else %}
+            <div class="empty">
+                Ask something from your PDFs 👇
+            </div>
+            {% endif %}
+
+        </div>
+
+        <!-- INPUT BOX -->
+        <form class="chat-input" action="/ask" method="post">
+
+            <input
+                type="text"
+                name="query"
+                placeholder="Ask anything from your documents..."
+                required
+            >
+
+            <button type="submit">Send</button>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>
