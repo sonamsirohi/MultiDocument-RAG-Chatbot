@@ -12,7 +12,6 @@ An AI-powered **Retrieval-Augmented Generation (RAG) chatbot** that allows users
 - 🔍 Semantic search using embeddings (OpenAI)
 - 🧠 Retrieval-Augmented Generation (RAG pipeline)
 - 💬 Conversation history stored per session
-- 📁 View uploaded document names in sidebar
 - 🔐 Simple authentication system (Flask sessions)
 - ⚡ Context-based answers only from documents
 - 🖥 Clean UI with chat + document panel layout
